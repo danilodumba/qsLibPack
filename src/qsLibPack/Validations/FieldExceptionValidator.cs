@@ -3,7 +3,7 @@ using qsLibPack.Domain.Exceptions;
 
 namespace qsLibPack.Validations
 {
-    public static class FieldValidation
+    public static class FieldExceptionValidator
     {
         public static void LessThanOrEqualZero(this decimal value)
         {

@@ -1,8 +1,8 @@
-namespace qs.Domain.Core.Validations
+namespace qsLibPack.Validations
 {
-    public class DomainError
+    public class ErrorValidation
     {
-        public DomainError(string code, string description)
+        public ErrorValidation(string code, string description)
         {
             Code = code;
             Description = description;
