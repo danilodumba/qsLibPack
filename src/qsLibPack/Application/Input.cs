@@ -5,7 +5,7 @@ namespace qsLibPack.Application
 {
     public abstract class Input
     {
-        public IList<ValidationFailure> Errors {get; private set; }
+        public IList<ValidationFailure> Errors {get; protected set; }
         public abstract bool IsValid();
     }
 }
