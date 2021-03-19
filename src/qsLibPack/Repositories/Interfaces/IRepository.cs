@@ -11,5 +11,6 @@ namespace qsLibPack.Repositories.Interfaces
         void Update(T entity);
         T GetByID(TId id);
         Task<T> GetByIDAsync(TId id);
+        void Remove(T entity);
     }
 }

@@ -7,12 +7,10 @@ namespace qsLibPack.Repositories.EF
 {
     public abstract class Repository<T, TId> where T : AggregateRoot<TId>
     {
-        protected DbContext _context;
         protected DbSet<T> _dbSet;
 
         protected Repository(DbContext context)
         {
-            _context = context;
             _dbSet = context.Set<T>();
         }
 
@@ -29,13 +27,20 @@ namespace qsLibPack.Repositories.EF
         {
             _dbSet.Update(entity);
         }
+
         public virtual T GetByID(TId id)
         {
             return _dbSet.FirstOrDefault(x => x.Id.Equals(id));
         }
+
         public async virtual Task<T> GetByIDAsync(TId id)
         {
             return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id));
+        }
+
+        public void Remove(T entity)
+        {
+            _dbSet.Remove(entity);
         }
     }
 }
