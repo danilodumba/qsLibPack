@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -31,24 +30,17 @@ namespace qsLibPack.Middlewares
         private async Task HandleValidation(HttpContext context, IValidationService validationService)
         {
             var settings = new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                };
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
 
             if (!context.Response.HasStarted)
             {
                 var result = JsonConvert.SerializeObject(validationService.GetErrors(), settings);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await context.Response.WriteAsync(result);                
+                await context.Response.WriteAsync(result);
             }
-            else if (context.Response.StatusCode == 400)
-            {
-                context.Response.Clear();
-                var result = JsonConvert.SerializeObject(validationService.GetErrors(), settings);
-                await context.Response.WriteAsync(result);             
-            }
-
         }
     }
 

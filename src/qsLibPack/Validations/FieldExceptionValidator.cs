@@ -14,6 +14,15 @@ namespace qsLibPack.Validations
             if (value <= 0) RiseException(message);
         }
 
+        public static void LessThanOrEqualZero(this long value)
+        {
+            LessThanOrEqualZero(value, null);
+        }
+        public static void LessThanOrEqualZero(this long value, string message)
+        {
+            if (value <= 0) RiseException(message);
+        }
+
         public static void LessThanOrEqualZero(this int value)
         {
             LessThanOrEqualZero(value, null);

@@ -1,7 +1,7 @@
 
 using qsLibPack.Validations;
 
-namespace qs.Domain.Core.ValueObjects
+namespace qsLibPack.Domain.ValueObjects
 {
     public struct NameVO
     {
