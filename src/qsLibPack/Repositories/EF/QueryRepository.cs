@@ -4,6 +4,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using qsLibPack.Domain.Entities;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Reflection;
 
 namespace qsLibPack.Repositories.EF
 {
@@ -19,18 +21,59 @@ namespace qsLibPack.Repositories.EF
         /// Faz o select em seu banco de dados
         /// </summary>
         /// <typeparam name="Tdto">Sua classe de DTO</typeparam>
-        protected IQueryable<Tdto> SelectSql<Tdto>(string sql) where Tdto: class
+        protected IList<Tdto> SelectSql<Tdto>(string sql) where Tdto: class
         {
-            return _context.Set<Tdto>().FromSqlRaw(sql);
+            return this.SelectFromSqlADO<Tdto>(sql);
         }
 
         /// <summary>
         /// Faz o select em seu banco de dados
         /// </summary>
         /// <typeparam name="Tdto"></typeparam>
-        protected IQueryable<Tdto> SelectSql<Tdto>(string sql, params object[] parameters) where Tdto: class
+        protected IList<Tdto> SelectSql<Tdto>(string sql, params object[] parameters) where Tdto: class
         {
-            return _context.Set<Tdto>().FromSqlRaw(sql, parameters);
+            return this.SelectFromSqlADO<Tdto>(sql, parameters);
+        }
+
+        private IList<Tdto> SelectFromSqlADO<Tdto>(string sql, params object[] parameters) where Tdto: class
+        {
+            using var command = _context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = sql;
+
+            foreach (var parameter in parameters)
+            {
+                command.Parameters.Add(parameter);
+            }
+
+            _context.Database.OpenConnection();
+            using var result = command.ExecuteReader();
+            return DataReaderMapToList<Tdto>(result);
+        }
+
+        private static List<T> DataReaderMapToList<T>(DbDataReader dr)
+        {
+            List<T> list = new List<T>();
+
+            if (dr.HasRows)
+            {
+                while (dr.Read())
+                {
+                    var obj = Activator.CreateInstance<T>();
+                    foreach (PropertyInfo prop in obj.GetType().GetProperties())
+                    {
+                        if (dr.GetColumnSchema().Any(x => x.ColumnName.ToUpper() == prop.Name.ToUpper()))
+                        {
+                            if (!Equals(dr[prop.Name], DBNull.Value))
+                            {
+                                prop.SetValue(obj, dr[prop.Name], null);
+                            }
+                        }
+                    }
+                    list.Add(obj);
+                }
+                return list;
+            }
+            return new List<T>();
         }
 
         /// <summary>

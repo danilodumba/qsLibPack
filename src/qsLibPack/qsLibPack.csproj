@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>qsLibPack</PackageId>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <Authors>Danilo Dumbá</Authors>
     <Company>DDSTECH</Company>
     <PackageDescription>Pacote com algumas libs para padronização de desenvolvimento com DDD, Mediator, CQRS, Repository, Validations e Extensions</PackageDescription>
