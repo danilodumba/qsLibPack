@@ -19,7 +19,7 @@ namespace qsLibPack.Repositories.EF
         /// Faz o select em seu banco de dados usando o LINQ do Entity Framework (EF)
         /// </summary>
         /// <typeparam name="TEntity">Sua classe de entidade</typeparam>
-        protected IEnumerable<TEntity> Where<TEntity>(Func<TEntity, bool> predicate) where TEntity: class
+        protected IEnumerable<TEntity> SelectLinq<TEntity>(Func<TEntity, bool> predicate) where TEntity: class
         {
             return _context.Set<TEntity>().Where(predicate);
         }
