@@ -30,11 +30,6 @@ namespace qsLibPack.Repositories.EF
         /// <typeparam name="Tdto"></typeparam>
         protected IList<Tdto> SelectSql<Tdto>(string sql, params object[] parameters) where Tdto: class
         {
-            return this.SelectFromSqlADO<Tdto>(sql, parameters);
-        }
-
-        private IList<Tdto> SelectFromSqlADO<Tdto>(string sql, params object[] parameters) where Tdto: class
-        {
             using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = sql;
 
