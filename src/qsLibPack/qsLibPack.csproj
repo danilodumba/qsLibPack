@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PackageId>qsLibPack</PackageId>
+    <PackageId>qs.LibPack</PackageId>
     <Version>1.2.0</Version>
     <Authors>Danilo Dumbá</Authors>
     <Company>DDSTECH</Company>

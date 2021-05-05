@@ -28,6 +28,12 @@ namespace qsLibPack.Repositories.EF
             _dbSet.Update(entity);
         }
 
+        public Task UpdateAsync(T entity)
+        {
+            _dbSet.Update(entity);
+            return Task.CompletedTask;
+        }
+
         public virtual T GetByID(TId id)
         {
             return _dbSet.FirstOrDefault(x => x.Id.Equals(id));
@@ -38,9 +44,15 @@ namespace qsLibPack.Repositories.EF
             return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id));
         }
 
-        public void Remove(T entity)
+        public virtual void Remove(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public virtual Task RemoveAsync(T entity)
+        {
+            _dbSet.Remove(entity);
+            return Task.CompletedTask;
         }
     }
 }
