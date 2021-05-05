@@ -12,7 +12,7 @@ namespace qsLibPack.Controllers
             _validationService = validationService;
         }
 
-        protected IActionResult LibResult(IActionResult result)
+        protected IActionResult Result(IActionResult result)
         {
             if (_validationService.IsValid())
             {
