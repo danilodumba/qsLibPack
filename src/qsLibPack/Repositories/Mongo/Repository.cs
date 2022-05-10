@@ -13,7 +13,6 @@ namespace qsLibPack.Repositories.Mongo
     {
         protected readonly IMongoContext _context;
         protected readonly IMongoCollection<TEntity> _dbSet;
-
         protected Repository(IMongoContext context)
         {
             _context = context;

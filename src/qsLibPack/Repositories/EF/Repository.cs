@@ -16,20 +16,24 @@ namespace qsLibPack.Repositories.EF
 
         public virtual void Create(T entity)
         {
+            entity.Validate();
             _dbSet.Add(entity);
         }
 
         public async virtual Task CreateAsync(T entity)
         {
+            entity.Validate();
             await _dbSet.AddAsync(entity);
         }
         public virtual void Update(T entity)
         {
+            entity.Validate();
             _dbSet.Update(entity);
         }
 
         public Task UpdateAsync(T entity)
         {
+            entity.Validate();
             _dbSet.Update(entity);
             return Task.CompletedTask;
         }

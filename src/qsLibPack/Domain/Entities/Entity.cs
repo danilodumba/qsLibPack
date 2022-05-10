@@ -40,6 +40,6 @@ namespace qsLibPack.Domain.Entities
             return (GetType().GetHashCode() ^ 93) + Id.GetHashCode();
         }
 
-        protected abstract void Validate();
+        public abstract void Validate();
     }
 }

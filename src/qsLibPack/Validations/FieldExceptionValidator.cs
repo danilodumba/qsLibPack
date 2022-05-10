@@ -47,7 +47,7 @@ namespace qsLibPack.Validations
         }
         public static void NotNullOrEmpty(this Guid value, string message)
         {
-            if (value == null || value == Guid.Empty) RiseException(message);
+            if (value == Guid.Empty) RiseException(message);
         }
 
         public static void NotNull(this object value)
