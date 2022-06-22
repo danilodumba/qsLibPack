@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <PackageId>qs.LibPack</PackageId>
-    <Version>6.0.0</Version>
+    <Version>6.1.0</Version>
     <Authors>Danilo Dumbá</Authors>
     <Company>DDSTECH</Company>
     <PackageDescription>Pacote com algumas libs para padronização de desenvolvimento com DDD, Mediator, CQRS, Repository, Validations e Extensions</PackageDescription>

@@ -9,7 +9,7 @@ namespace qsLibPack.Repositories.EF
 {
     public abstract class QueryRepository
     {
-        readonly DbContext _context;
+        protected readonly DbContext _context;
         protected QueryRepository(DbContext context)
         {
             _context = context;
@@ -41,6 +41,24 @@ namespace qsLibPack.Repositories.EF
             _context.Database.OpenConnection();
             using var result = command.ExecuteReader();
             return DataReaderMapToList<Tdto>(result);
+        }
+
+        /// <summary>
+        /// Executa queries de retorno unico. Ex select count from table
+        /// </summary>
+        protected object ExecuteScalar(string sql, params object[] parameters)
+        {
+            using var command = _context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = sql;
+
+            foreach (var parameter in parameters)
+            {
+                command.Parameters.Add(parameter);
+            }
+
+            _context.Database.OpenConnection();
+            var result = command.ExecuteScalar();
+            return result;
         }
 
         private static List<Tdto> DataReaderMapToList<Tdto>(DbDataReader dr)
