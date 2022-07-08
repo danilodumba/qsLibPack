@@ -21,12 +21,14 @@ namespace qsLibPack.Repositories.Mongo
         
         public virtual void Create(TEntity entity)
         {
+            entity.Validate();
             Func<Task> func = async () => await _dbSet.InsertOneAsync(entity);
             _context.AddCommand(func);
         }
 
         public virtual Task CreateAsync(TEntity entity)
         {
+            entity.Validate();
             Func<Task> func = async () => await _dbSet.InsertOneAsync(entity);
             _context.AddCommand(func);
 
@@ -52,6 +54,7 @@ namespace qsLibPack.Repositories.Mongo
 
         public virtual void Update(TEntity entity)
         {
+            entity.Validate();
             _context.AddCommand(async () =>
             {
                 await _dbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), entity);
@@ -71,6 +74,7 @@ namespace qsLibPack.Repositories.Mongo
 
         public Task UpdateAsync(TEntity entity)
         {
+            entity.Validate();
             _context.AddCommand(async () =>
             {
                 await _dbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), entity);
