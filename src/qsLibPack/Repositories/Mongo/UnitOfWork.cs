@@ -12,11 +12,6 @@ namespace qsLibPack.Repositories.Mongo
             _context = context;
         }
 
-        public void Commit()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public async Task CommitAsync()
         {
             await _context.SaveChangesAsync();

@@ -6,7 +6,7 @@ namespace qsLibPack.Domain.ValueObjects
     public struct NameVO
     {
         readonly string _nome;
-        public NameVO(string nome)
+        private NameVO(string nome)
         {
             _nome = nome;
         }

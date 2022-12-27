@@ -23,8 +23,8 @@ namespace qsLibPack.Test.Domain.ValueObjects
         [InlineData("teste@teste.info")]
         public void Deve_Retornar_Email_Valido(string email)
         {
-           var vo = new EmailVO(email);
-           Assert.Equal(email, vo.ToString());
+           EmailVO emailVo = email;
+           Assert.Equal(email, emailVo);
         }
     }
 }

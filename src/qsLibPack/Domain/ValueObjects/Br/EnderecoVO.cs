@@ -5,29 +5,29 @@ namespace qsLibPack.Domain.ValueObjects.Br
 {
     public class EnderecoVO
     {
-        protected EnderecoVO() { }
-
-        public EnderecoVO(string street, string number, string complement, string district, string zipCode, string city, string state)
+        public EnderecoVO() {}
+        public EnderecoVO(string logradouro, string numero, string complemento, string bairro, string cep, string cidade, string estado)
         {
-            Logradouro = street;
-            Nummero = number;
-            Complemento = complement;
-            Bairro = district;
-            Cidade = city;
-            Estado = state;
+            Logradouro = logradouro;
+            Numero = numero;
+            Complemento = complemento;
+            Bairro = bairro;
+            Cidade = cidade;
+            Estado = estado;
 
-            this.SetCep(zipCode);
+            this.SetCep(cep);
         }
+
 
         #region [ Propriedades ]
 
-        public string Logradouro { get; private set; }
-        public string Nummero { get; private set; }
-        public string Complemento { get; private set; }
-        public string Bairro { get; private set; }
-        public string Cep { get; private set; }
-        public string Cidade { get; private set; }
-        public string Estado { get; private set; }
+        public string Logradouro { get; set; }
+        public string Numero { get; set; }
+        public string Complemento { get; set; }
+        public string Bairro { get; set; }
+        public string Cep { get; set; }
+        public string Cidade { get; set; }
+        public string Estado { get; set; }
 
         #endregion
 
@@ -49,7 +49,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         #endregion
 
         #region [ Public Methods ]
-        public void ValidateAll()
+        public void ValidarTodos()
         {
             this.ValidarLogradouro();
             this.ValidarCidade();
@@ -69,7 +69,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
 
         public void ValidarNumero()
         {
-            if (string.IsNullOrEmpty(this.Nummero))
+            if (string.IsNullOrEmpty(this.Numero))
             {
                 throw new DomainException("Infome um numero");
             }

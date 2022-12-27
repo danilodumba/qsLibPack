@@ -5,17 +5,13 @@ using qsLibPack.Extensions;
 
 namespace qsLibPack.Domain.ValueObjects.Br
 {
-    public class CpfCnpjVO: ValueObject
+    public struct CpfCnpjVO
     {
-        public string Value { get; private set; }
+        private readonly string _value;
         private CpfCnpjVO(string cpfCnpj)
         {
-            Value = cpfCnpj.OnlyNumbers();
-            this.ValidarCpfCnpf(Value);
-        }
-
-        protected CpfCnpjVO()
-        {
+            _value = cpfCnpj.OnlyNumbers();
+            this.ValidarCpfCnpf(_value);
         }
 
         private bool ValidarCpfCnpf(string cpfcnpj)
@@ -82,11 +78,11 @@ namespace qsLibPack.Domain.ValueObjects.Br
         }
 
         public override string ToString() 
-            => Value;
+            => _value;
 
-        public override void Validate()
+        public void Validate()
         {
-            if (!this.ValidarCpfCnpf(Value))
+            if (!this.ValidarCpfCnpf(_value))
             {
                 throw new DomainException("CPF ou CNPJ inválido");
             }
@@ -94,7 +90,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
 
         public bool IsValid()
         {
-            return this.ValidarCpfCnpf(Value);
+            return this.ValidarCpfCnpf(_value);
         }
 
         public static implicit operator CpfCnpjVO(string value)

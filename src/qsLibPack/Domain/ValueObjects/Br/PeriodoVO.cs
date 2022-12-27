@@ -3,9 +3,8 @@ using qsLibPack.Domain.Exceptions;
 
 namespace qsLibPack.Domain.ValueObjects.Br
 {
-    public class PeriodoVO
+    public struct PeriodoVO
     {
-        protected PeriodoVO() {}
         public PeriodoVO(DateTime dataInicial, DateTime dataFinal)
         {
             DataInicial = dataInicial;

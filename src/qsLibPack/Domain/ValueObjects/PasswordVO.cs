@@ -17,13 +17,8 @@ namespace qsLibPack.Domain.ValueObjects
             this.Validate();
         }
 
-        public string Value 
-        { 
-            get => password;
-        }
-
          public override string ToString() 
-         => this.Value;
+            => password;
 
         public override void Validate()
         {

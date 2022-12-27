@@ -21,17 +21,6 @@ namespace qsLibPack.Mediator
 
         public abstract Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
 
-        [ObsoleteAttribute("This method is obsolete. Call IsValidCommand instead.", false)]
-        protected bool CommandIsValid(TRequest request)
-        {
-            if (!request.IsValid())
-            {
-                _validationService.AddErrors(request.Errors);
-                return false;
-            }
-            return true;
-        }
-
         protected bool IsValidCommand(TRequest request)
         {
             if (!request.IsValid())
