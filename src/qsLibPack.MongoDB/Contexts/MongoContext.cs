@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -13,16 +14,16 @@ namespace qsLibPack.Repositories.Mongo.Contexts
         private IMongoDatabase Database { get; set; }
         public IClientSessionHandle Session { get; set; }
         public MongoClient MongoClient { get; set; }
-        private readonly List<Func<Task>> _commands;
+        private readonly List<Func<CancellationToken, Task>> _commands;
         private readonly MongoSettings _settings;
 
         public MongoContext(IOptions<MongoSettings> settings)
         {
             _settings = settings.Value;
-            _commands = new List<Func<Task>>();
+            _commands = new List<Func<CancellationToken, Task>>();
         }
         
-        public void AddCommand(Func<Task> func)
+        public void AddCommand(Func<CancellationToken, Task> func)
         {
             _commands.Add(func);
         }
@@ -33,18 +34,19 @@ namespace qsLibPack.Repositories.Mongo.Contexts
             return Database.GetCollection<T>(name);
         }
 
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             Configure();
 
-            using (Session = await MongoClient.StartSessionAsync())
+            using (Session = await MongoClient.StartSessionAsync(cancellationToken: cancellationToken))
             {
-                var commandTasks = _commands.Select(c => c());
+                var commandTasks = _commands.Select(c => c(cancellationToken));
                 await Task.WhenAll(commandTasks);
             }
 
+            var executedCount = _commands.Count;
             _commands.Clear();
-            return _commands.Count;
+            return executedCount;
         }
 
         public void Dispose()

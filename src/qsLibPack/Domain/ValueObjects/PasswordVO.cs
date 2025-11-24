@@ -1,4 +1,6 @@
+using System;
 using System.Text;
+using System.Security.Cryptography;
 using qsLibPack.Domain.Exceptions;
 
 namespace qsLibPack.Domain.ValueObjects
@@ -27,27 +29,38 @@ namespace qsLibPack.Domain.ValueObjects
         }
         public bool EqualsCript(string obj)
         {
-            obj = this.CriptPassword(obj);
-            return this.password.Equals(obj);
+            if (string.IsNullOrEmpty(this.password))
+            {
+                return false;
+            }
+
+            var parts = this.password.Split(':');
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            var salt = Convert.FromBase64String(parts[0]);
+            var storedHash = Convert.FromBase64String(parts[1]);
+
+            var computedHash = DeriveHash(obj, salt);
+            return CryptographicOperations.FixedTimeEquals(storedHash, computedHash);
         }
 
         public void CriptPassword()
         {
-            this.password = this.CriptPassword(this.password);
+            var salt = new byte[16];
+            RandomNumberGenerator.Fill(salt);
+
+            var hash = DeriveHash(this.password, salt);
+
+            this.password = string.Concat(Convert.ToBase64String(salt), ":", Convert.ToBase64String(hash));
         }
 
-        private string CriptPassword(string password)
+        private static byte[] DeriveHash(string value, byte[] salt)
         {
-            var md5 = System.Security.Cryptography.MD5.Create();
-            byte[] inputBytes = Encoding.ASCII.GetBytes(password);
-            byte[] hash = md5.ComputeHash(inputBytes);
-            var sb = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("X2"));
-            }
-            
-            return sb.ToString();
+            using var rfc = new Rfc2898DeriveBytes(value, salt, 100_000, HashAlgorithmName.SHA256);
+            return rfc.GetBytes(32);
         }
     }
 }

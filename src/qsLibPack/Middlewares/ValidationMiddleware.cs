@@ -39,7 +39,7 @@ namespace qsLibPack.Middlewares
                 var result = JsonConvert.SerializeObject(validationService.GetErrors(), settings);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await context.Response.WriteAsync(result);
+                await context.Response.WriteAsync(result, context.RequestAborted);
             }
         }
     }

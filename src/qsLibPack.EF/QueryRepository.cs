@@ -39,8 +39,15 @@ namespace qsLibPack.Repositories.EF
             }
 
             _context.Database.OpenConnection();
-            using var result = command.ExecuteReader();
-            return DataReaderMapToList<Tdto>(result);
+            try
+            {
+                using var result = command.ExecuteReader();
+                return DataReaderMapToList<Tdto>(result);
+            }
+            finally
+            {
+                _context.Database.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -57,8 +64,14 @@ namespace qsLibPack.Repositories.EF
             }
 
             _context.Database.OpenConnection();
-            var result = command.ExecuteScalar();
-            return result;
+            try
+            {
+                return command.ExecuteScalar();
+            }
+            finally
+            {
+                _context.Database.CloseConnection();
+            }
         }
 
         private static List<Tdto> DataReaderMapToList<Tdto>(DbDataReader dr)

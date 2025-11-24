@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using qsLibPack.Repositories.Interfaces;
 using qsLibPack.Repositories.Mongo.Core;
@@ -12,9 +13,9 @@ namespace qsLibPack.Repositories.Mongo
             _context = context;
         }
 
-        public async Task CommitAsync()
+        public async Task CommitAsync(CancellationToken cancellationToken = default)
         {
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

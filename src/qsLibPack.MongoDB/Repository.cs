@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using qsLibPack.Domain.Entities;
@@ -22,15 +23,13 @@ namespace qsLibPack.Repositories.Mongo
         public virtual void Create(TEntity entity)
         {
             entity.Validate();
-            Func<Task> func = async () => await _dbSet.InsertOneAsync(entity);
-            _context.AddCommand(func);
+            _context.AddCommand(async ct => await _dbSet.InsertOneAsync(entity, null, ct));
         }
 
-        public virtual Task CreateAsync(TEntity entity)
+        public virtual Task CreateAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             entity.Validate();
-            Func<Task> func = async () => await _dbSet.InsertOneAsync(entity);
-            _context.AddCommand(func);
+            _context.AddCommand(async ct => await _dbSet.InsertOneAsync(entity, null, ct));
 
             return Task.CompletedTask;
         }
@@ -41,29 +40,29 @@ namespace qsLibPack.Repositories.Mongo
             return data.FirstOrDefault();
         }
 
-        public async virtual Task<TEntity> GetByIDAsync(TId id)
+        public async virtual Task<TEntity> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
         {
-            var data = await _dbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", id));
+            var data = await _dbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", id), cancellationToken: cancellationToken);
             return data.FirstOrDefault();
         }
 
         public virtual void Remove(TEntity entity)
         {
-           _context.AddCommand(() => _dbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id)));
+           _context.AddCommand(ct => _dbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), ct));
         }
 
         public virtual void Update(TEntity entity)
         {
             entity.Validate();
-            _context.AddCommand(async () =>
+            _context.AddCommand(async ct =>
             {
-                await _dbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), entity);
+                await _dbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), entity, cancellationToken: ct);
             });
         }
 
-        public virtual async Task<IEnumerable<TEntity>> ListAll()
+        public virtual async Task<IEnumerable<TEntity>> ListAll(CancellationToken cancellationToken = default)
         {
-            var all = await _dbSet.FindAsync(Builders<TEntity>.Filter.Empty);
+            var all = await _dbSet.FindAsync(Builders<TEntity>.Filter.Empty, cancellationToken: cancellationToken);
             return all.ToList();
         }
 
@@ -72,20 +71,20 @@ namespace qsLibPack.Repositories.Mongo
             GC.SuppressFinalize(this);
         }
 
-        public Task UpdateAsync(TEntity entity)
+        public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             entity.Validate();
-            _context.AddCommand(async () =>
+            _context.AddCommand(async ct =>
             {
-                await _dbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), entity);
+                await _dbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), entity, cancellationToken: ct);
             });
 
             return Task.CompletedTask;
         }
 
-        public Task RemoveAsync(TEntity entity)
+        public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
-           _context.AddCommand(() => _dbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id)));
+           _context.AddCommand(ct => _dbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", entity.Id), ct));
            return Task.CompletedTask;
         }
     }

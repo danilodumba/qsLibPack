@@ -17,8 +17,6 @@ namespace qsLibPack.Domain.Exceptions
         {
         }
 
-        protected DomainException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+        
     }
 }

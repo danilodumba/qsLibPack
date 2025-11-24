@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using qsLibPack.Domain.Entities;
 
 namespace qsLibPack.Repositories.EF
@@ -20,10 +21,10 @@ namespace qsLibPack.Repositories.EF
             _dbSet.Add(entity);
         }
 
-        public async virtual Task CreateAsync(T entity)
+        public async virtual Task CreateAsync(T entity, CancellationToken cancellationToken = default)
         {
             entity.Validate();
-            await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity, cancellationToken);
         }
         public virtual void Update(T entity)
         {
@@ -31,7 +32,7 @@ namespace qsLibPack.Repositories.EF
             _dbSet.Update(entity);
         }
 
-        public Task UpdateAsync(T entity)
+        public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
         {
             entity.Validate();
             _dbSet.Update(entity);
@@ -43,9 +44,9 @@ namespace qsLibPack.Repositories.EF
             return _dbSet.FirstOrDefault(x => x.Id.Equals(id));
         }
 
-        public async virtual Task<T> GetByIDAsync(TId id)
+        public async virtual Task<T> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
         }
 
         public virtual void Remove(T entity)
@@ -53,7 +54,7 @@ namespace qsLibPack.Repositories.EF
             _dbSet.Remove(entity);
         }
 
-        public virtual Task RemoveAsync(T entity)
+        public virtual Task RemoveAsync(T entity, CancellationToken cancellationToken = default)
         {
             _dbSet.Remove(entity);
             return Task.CompletedTask;

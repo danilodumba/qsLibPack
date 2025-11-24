@@ -17,8 +17,6 @@ namespace Middlewares.Exceptions
         {
         }
 
-        protected ValidationException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+        
     }
 }
