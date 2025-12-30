@@ -6,8 +6,9 @@
     <Version>8.0.0</Version>
     <Authors>Danilo Dumbá</Authors>
     <Company>DDS.TEC</Company>
-    <PackageDescription>Pacote com libs para padronização de desenvolvimento com DDD, CQRS, Repository, Validations e Extensions (sem dependência de MediatR)</PackageDescription>
+    <PackageDescription>Pacote com libs para padronização de desenvolvimento com DDD, CQRS, Repository, Validations e Extensions </PackageDescription>
     <RepositoryUrl>https://github.com/danilodumba/qsLibPack</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +17,9 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.*" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>

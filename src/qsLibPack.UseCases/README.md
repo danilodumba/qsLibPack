@@ -1,93 +1,157 @@
 # qsLibPack.UseCases
 
-Biblioteca focada em abstrações para implementação de Use Cases seguindo princípios de Clean Architecture, com padrão semelhante ao MediatR (requests/handlers) e suporte a behaviors de pipeline (validação, exceção e unidade de trabalho).
+![NuGet](https://img.shields.io/nuget/v/qs.LibPack.UseCases?label=NuGet) ![.NET](https://img.shields.io/badge/.NET-8.0-blueviolet)
+
+Abstrações para implementação de Use Cases seguindo Clean Architecture, com Requests/Handlers, Dispatcher e Pipeline Behaviors (validação, exceção e unidade de trabalho).
 
 ## Instalação
 
-- Referencie o projeto `qsLibPack.UseCases` no seu solution.
-- Garanta que o projeto raiz chame o registro de DI.
+```bash
+dotnet add package qs.LibPack.UseCases --version 8.0.0
+```
 
-## Estrutura
+## Exemplos
 
-- `Abstractions`: Contratos principais (`IRequest<T>`, `IUseCaseHandler<,>`, `IPipelineBehavior<,>`, `IUseCaseDispatcher`, `IResponse`).
-- `Behaviors`: Implementações de pipeline (`ValidationBehavior`, `ExceptionHandlingBehavior`, `UnitOfWorkBehavior`).
-- `Exceptions`: Exceções customizadas (`UseCaseException`).
-- `Models`: DTOs/VOs (`Response`, `Response<T>`).
+### Básico
 
-## Uso
-
-1. Crie uma requisição:
+Query retornando DTO com `Response<T>`.
 
 ```csharp
-public sealed class CreateUserCommand : qsLibPack.UseCases.Abstractions.ICommand<qsLibPack.UseCases.Models.Response>
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using qsLibPack.UseCases.Abstractions;
+using qsLibPack.UseCases.IoC;
+using qsLibPack.UseCases.Models;
+
+public sealed class GetUserByIdQuery : IQuery<Response<UserDto>>
+{
+    public long Id { get; init; }
+}
+
+public sealed class GetUserByIdHandler : IUseCaseHandler<GetUserByIdQuery, Response<UserDto>>
+{
+    private readonly IUserReadRepository repo;
+    public GetUserByIdHandler(IUserReadRepository repo) => this.repo = repo;
+
+    public async Task<Response<UserDto>> Handle(GetUserByIdQuery request, CancellationToken ct)
+    {
+        var user = await repo.GetByIdAsync(request.Id, ct);
+        return user is null
+            ? Response<UserDto>.Fail(new[] { new qsLibPack.Validations.ErrorValidation("NotFound", "Usuário não encontrado") })
+            : Response<UserDto>.Ok(new UserDto(user.Id, user.Name, user.Email));
+    }
+}
+
+public record UserDto(long Id, string Name, string Email);
+
+var services = new ServiceCollection();
+services.AddUseCases(typeof(GetUserByIdHandler).Assembly);
+var provider = services.BuildServiceProvider();
+var dispatcher = provider.GetRequiredService<IUseCaseDispatcher>();
+var result = await dispatcher.Send(new GetUserByIdQuery { Id = 1 });
+```
+
+### Intermediário
+
+Comando com validação FluentValidation e commit automático via `UnitOfWorkBehavior`.
+
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using qsLibPack.UseCases.Abstractions;
+using qsLibPack.UseCases.IoC;
+using qsLibPack.UseCases.Models;
+
+public sealed class CreateUserCommand : ICommand<Response>
 {
     public string Name { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
 }
-```
-
-2. Opcional: validador FluentValidation:
-
-```csharp
-using FluentValidation;
 
 public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserValidator()
     {
-        RuleFor(x => x.Name).NotEmpty();
-        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+        RuleFor(x => x.Name).NotEmpty().WithErrorCode("Name");
+        RuleFor(x => x.Email).NotEmpty().EmailAddress().WithErrorCode("Email");
     }
 }
-```
-
-3. Handler:
-
-```csharp
-using System.Threading;
-using System.Threading.Tasks;
-using qsLibPack.UseCases.Abstractions;
-using qsLibPack.UseCases.Models;
 
 public sealed class CreateUserHandler : IUseCaseHandler<CreateUserCommand, Response>
 {
-    public Task<Response> Handle(CreateUserCommand request, CancellationToken cancellationToken)
-        => Task.FromResult(Response.Ok());
+    private readonly IUserRepository repo;
+    public CreateUserHandler(IUserRepository repo) => this.repo = repo;
+
+    public async Task<Response> Handle(CreateUserCommand request, CancellationToken ct)
+    {
+        await repo.AddAsync(new User { Name = request.Name, Email = request.Email }, ct);
+        return Response.Ok();
+    }
 }
-```
-
-4. Registro de DI:
-
-```csharp
-using Microsoft.Extensions.DependencyInjection;
-using qsLibPack.UseCases.IoC;
 
 var services = new ServiceCollection();
+services.AddLogging();
 services.AddUseCases(typeof(CreateUserHandler).Assembly);
-```
-
-5. Execução:
-
-```csharp
-using System.Threading.Tasks;
-using qsLibPack.UseCases;
-using qsLibPack.UseCases.Abstractions;
-
+services.AddScoped<qsLibPack.Repositories.Interfaces.IUnitOfWork, MyUnitOfWork>();
 var provider = services.BuildServiceProvider();
 var dispatcher = provider.GetRequiredService<IUseCaseDispatcher>();
-var response = await dispatcher.Send(new CreateUserCommand());
+var response = await dispatcher.Send(new CreateUserCommand { Name = "Alice", Email = "alice@acme.com" });
 ```
 
-## Behaviors
+### Avançado
 
-- `ValidationBehavior`: executa validadores `IValidator<TRequest>`. Em falha, lança `UseCaseException` com erros.
-- `ExceptionHandlingBehavior`: captura exceções não tratadas e converte para `UseCaseException` com log.
-- `UnitOfWorkBehavior`: aplica `IUnitOfWork.CommitAsync` após handlers de `ICommand<TResponse>`.
+Behavior customizado para auditoria e exceções centralizadas.
 
-## Versionamento Semântico
+```csharp
+using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using qsLibPack.UseCases.Abstractions;
+using qsLibPack.UseCases.IoC;
 
-- O projeto segue versionamento semântico via campo `Version` no `.csproj`. Ajuste conforme mudanças.
+public sealed class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+{
+    public async Task<TResponse> Handle(TRequest request, CancellationToken ct, Func<Task<TResponse>> next)
+    {
+        var sw = Stopwatch.StartNew();
+        var result = await next();
+        sw.Stop();
+        Console.WriteLine($"{typeof(TRequest).Name} -> {sw.ElapsedMilliseconds}ms");
+        return result;
+    }
+}
 
-## Testes
+var services = new ServiceCollection();
+services.AddLogging();
+services.AddUseCases(typeof(SomeHandler).Assembly);
+services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));
+```
 
-- Consulte o projeto `qsLibPack.UseCases.Test` para exemplos de testes de unidade e integração dos behaviors.
+## Informações do NuGet
+
+- Versão atual: 8.0.0
+- Dependências:
+  - Microsoft.Extensions.DependencyInjection 8.*
+  - Microsoft.Extensions.Logging.Abstractions 8.*
+  - FluentValidation 12.1.0
+- Compatibilidade: .NET 8 (net8.0)
+- Link direto: https://www.nuget.org/packages/qs.LibPack.UseCases/
+- Histórico (resumo):
+  - 8.0.0: estabilização dos behaviors, `Response` e `Dispatcher` com net8.0
+
+## Como Contribuir
+
+- Inclua exemplos de Requests/Handlers e behaviors com testes
+- Utilize versionamento semântico e mantenha APIs estáveis
+- Valide integração com DI e logging
+
+## Links
+
+- Repositório: https://github.com/danilodumba/qsLibPack
+- Documentação relacionada: [qsLibPack](file:///Volumes/danilo_ssd/Projetos/qsLibPack/src/qsLibPack/README.md)

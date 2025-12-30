@@ -8,6 +8,7 @@
     <Authors>Danilo Dumbá</Authors>
     <Company>DDS.TEC</Company>
     <Description>Integração Entity Framework Core para qsLibPack: Repositórios e consultas.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\qsLibPack\qsLibPack.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>
