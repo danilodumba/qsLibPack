@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,8 +15,8 @@ namespace qsLibPack.UseCases
     {
         private readonly IServiceProvider serviceProvider;
 
-        private static readonly ConcurrentDictionary<(Type, Type), (Type handlerType, MethodInfo handlerMethod, Type pipelineType, MethodInfo pipelineMethod)> _cache
-            = new ConcurrentDictionary<(Type, Type), (Type, MethodInfo, Type, MethodInfo)>();
+        private static readonly ConcurrentDictionary<(Type RequestType, Type ResponseType), object> _wrappers
+            = new ConcurrentDictionary<(Type, Type), object>();
 
         public UseCaseDispatcher(IServiceProvider serviceProvider)
         {
@@ -27,47 +25,47 @@ namespace qsLibPack.UseCases
 
         public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            var requestType = request.GetType();
-            var responseType = typeof(TResponse);
+            if (request is null) throw new ArgumentNullException(nameof(request));
 
-            var (handlerType, handlerMethod, pipelineType, pipelineMethod) = _cache.GetOrAdd(
-                (requestType, responseType),
-                key =>
+            var wrapper = (HandlerWrapper<TResponse>)_wrappers.GetOrAdd(
+                (request.GetType(), typeof(TResponse)),
+                static key =>
                 {
-                    var ht = typeof(IUseCaseHandler<,>).MakeGenericType(key.Item1, key.Item2);
-                    var hm = ht.GetMethod("Handle")!;
-                    var pt = typeof(IPipelineBehavior<,>).MakeGenericType(key.Item1, key.Item2);
-                    var pm = pt.GetMethod("Handle")!;
-                    return (ht, hm, pt, pm);
+                    var wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(key.RequestType, key.ResponseType);
+                    return Activator.CreateInstance(wrapperType)!;
                 });
 
-            var handler = serviceProvider.GetService(handlerType)
-                ?? throw new InvalidOperationException($"Handler não encontrado para {requestType.Name}");
-
-            var behaviors = serviceProvider.GetServices(pipelineType).Reverse().ToArray();
-
-            Func<Task<TResponse>> last = () => InvokeMethod<TResponse>(handlerMethod, handler, new object[] { request, cancellationToken });
-
-            foreach (var behavior in behaviors)
-            {
-                var capturedBehavior = behavior;
-                var next = last;
-                last = () => InvokeMethod<TResponse>(pipelineMethod, capturedBehavior, new object[] { request, cancellationToken, next });
-            }
-
-            return last();
+            return wrapper.Handle(request, serviceProvider, cancellationToken);
         }
 
-        private static Task<TResponse> InvokeMethod<TResponse>(MethodInfo method, object target, object[] args)
+        private abstract class HandlerWrapper<TResponse>
         {
-            try
+            public abstract Task<TResponse> Handle(IRequest<TResponse> request, IServiceProvider serviceProvider, CancellationToken cancellationToken);
+        }
+
+        private sealed class HandlerWrapper<TRequest, TResponse> : HandlerWrapper<TResponse>
+            where TRequest : IRequest<TResponse>
+        {
+            public override Task<TResponse> Handle(IRequest<TResponse> request, IServiceProvider serviceProvider, CancellationToken cancellationToken)
             {
-                return (Task<TResponse>)method.Invoke(target, args)!;
-            }
-            catch (TargetInvocationException tie) when (tie.InnerException is not null)
-            {
-                ExceptionDispatchInfo.Capture(tie.InnerException).Throw();
-                throw;
+                var typedRequest = (TRequest)request;
+
+                var handler = serviceProvider.GetService<IUseCaseHandler<TRequest, TResponse>>()
+                    ?? throw new InvalidOperationException($"Handler não encontrado para {typeof(TRequest).Name}");
+
+                var behaviorsEnum = serviceProvider.GetServices<IPipelineBehavior<TRequest, TResponse>>();
+                var behaviors = behaviorsEnum as IPipelineBehavior<TRequest, TResponse>[] ?? behaviorsEnum.ToArray();
+
+                Func<Task<TResponse>> next = () => handler.Handle(typedRequest, cancellationToken);
+
+                for (var i = behaviors.Length - 1; i >= 0; i--)
+                {
+                    var behavior = behaviors[i];
+                    var prev = next;
+                    next = () => behavior.Handle(typedRequest, cancellationToken, prev);
+                }
+
+                return next();
             }
         }
     }

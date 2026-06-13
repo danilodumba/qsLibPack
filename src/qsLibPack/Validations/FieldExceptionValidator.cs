@@ -9,7 +9,7 @@ namespace qsLibPack.Validations
         {
             LessThanOrEqualZero(value, null);
         }
-        public static void LessThanOrEqualZero(this decimal value, string message)
+        public static void LessThanOrEqualZero(this decimal value, string? message)
         {
             if (value <= 0) RiseException(message);
         }
@@ -18,7 +18,7 @@ namespace qsLibPack.Validations
         {
             LessThanOrEqualZero(value, null);
         }
-        public static void LessThanOrEqualZero(this long value, string message)
+        public static void LessThanOrEqualZero(this long value, string? message)
         {
             if (value <= 0) RiseException(message);
         }
@@ -27,7 +27,7 @@ namespace qsLibPack.Validations
         {
             LessThanOrEqualZero(value, null);
         }
-        public static void LessThanOrEqualZero(this int value, string message)
+        public static void LessThanOrEqualZero(this int value, string? message)
         {
             if (value <= 0) RiseException(message);
         }
@@ -36,7 +36,7 @@ namespace qsLibPack.Validations
         {
             NotNullOrEmpty(value, null);
         }
-        public static void NotNullOrEmpty(this string value, string message)
+        public static void NotNullOrEmpty(this string value, string? message)
         {
             if (string.IsNullOrWhiteSpace(value)) RiseException(message);
         }
@@ -45,22 +45,22 @@ namespace qsLibPack.Validations
         {
             NotNullOrEmpty(value, null);
         }
-        public static void NotNullOrEmpty(this Guid value, string message)
+        public static void NotNullOrEmpty(this Guid value, string? message)
         {
             if (value == Guid.Empty) RiseException(message);
         }
 
-        public static void NotNull(this object value)
+        public static void NotNull(this object? value)
         {
             NotNull(value, null);
         }
 
-        public static void NotNull(this object value, string message)
+        public static void NotNull(this object? value, string? message)
         {
             if (value == null) RiseException(message);
         }
 
-        private static void RiseException(string message)
+        private static void RiseException(string? message)
         {
             var text = "Invalid field";
             if (!string.IsNullOrWhiteSpace(message))

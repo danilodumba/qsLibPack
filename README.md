@@ -12,10 +12,10 @@ Conjunto de bibliotecas para padronizar desenvolvimento com DDD e CQRS: utilitá
 ## Instalação
 
 ```bash
-dotnet add package qs.LibPack --version 8.0.0
-dotnet add package qs.LibPack.UseCases --version 8.0.0
-dotnet add package qs.LibPack.EF --version 8.0.0
-dotnet add package qs.LibPack.MongoDB --version 8.0.0
+dotnet add package qs.LibPack --version 8.1.0
+dotnet add package qs.LibPack.UseCases --version 8.1.0
+dotnet add package qs.LibPack.EF --version 8.1.0
+dotnet add package qs.LibPack.MongoDB --version 8.1.0
 ```
 
 ## Exemplo Rápido

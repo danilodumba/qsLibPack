@@ -7,7 +7,7 @@ Abstrações para implementação de Use Cases seguindo Clean Architecture, com 
 ## Instalação
 
 ```bash
-dotnet add package qs.LibPack.UseCases --version 8.0.0
+dotnet add package qs.LibPack.UseCases --version 8.1.0
 ```
 
 ## Exemplos
@@ -135,7 +135,7 @@ services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));
 
 ## Informações do NuGet
 
-- Versão atual: 8.0.0
+- Versão atual: 8.1.0
 - Dependências:
   - Microsoft.Extensions.DependencyInjection 8.*
   - Microsoft.Extensions.Logging.Abstractions 8.*
@@ -144,6 +144,7 @@ services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));
 - Link direto: https://www.nuget.org/packages/qs.LibPack.UseCases/
 - Histórico (resumo):
   - 8.0.0: estabilização dos behaviors, `Response` e `Dispatcher` com net8.0
+  - 8.1.0: `Dispatcher` reescrito sem `MethodInfo.Invoke` (wrapper genérico fortemente tipado, cache por tipo de request) — exceções do handler propagam com stack original; `Response.Ok()` sem alocações desnecessárias; fast path de validador único no `ValidationBehavior`; `UnitOfWorkBehavior` não faz commit quando `IResponse.Success == false`
 
 ## Como Contribuir
 

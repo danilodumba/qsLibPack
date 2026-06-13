@@ -32,13 +32,13 @@ namespace qsLibPack.Repositories.Mongo
             return Task.CompletedTask;
         }
 
-        public virtual TEntity GetByID(TId id)
+        public virtual TEntity? GetByID(TId id)
         {
             var data = _dbSet.Find(Builders<TEntity>.Filter.Eq("_id", id));
             return data.FirstOrDefault();
         }
 
-        public async virtual Task<TEntity> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
+        public async virtual Task<TEntity?> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
         {
             var data = await _dbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", id), cancellationToken: cancellationToken).ConfigureAwait(false);
             return data.FirstOrDefault();

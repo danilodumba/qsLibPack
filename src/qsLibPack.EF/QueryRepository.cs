@@ -54,7 +54,7 @@ namespace qsLibPack.Repositories.EF
         /// <summary>
         /// Executa queries de retorno unico. Ex select count from table
         /// </summary>
-        protected object ExecuteScalar(string sql, params object[] parameters)
+        protected object? ExecuteScalar(string sql, params object[] parameters)
         {
             using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = sql;

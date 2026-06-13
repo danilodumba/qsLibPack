@@ -21,6 +21,19 @@ namespace qsLibPack.UseCases.Test
             => throw new InvalidOperationException("boom");
     }
 
+    public sealed class AsyncFailingQuery : IQuery<Response>
+    {
+    }
+
+    public sealed class AsyncFailingHandler : IUseCaseHandler<AsyncFailingQuery, Response>
+    {
+        public async Task<Response> Handle(AsyncFailingQuery request, CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+            throw new InvalidOperationException("boom-async");
+        }
+    }
+
     public class ExceptionHandlingBehaviorTests
     {
         [Fact]
@@ -39,6 +52,46 @@ namespace qsLibPack.UseCases.Test
             });
 
             Assert.Contains("Unexpected", System.Linq.Enumerable.Select(ex.Errors, e => e.Code));
+        }
+
+        [Fact]
+        public async Task Should_Preserve_Original_Exception_As_Inner()
+        {
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddUseCases(typeof(FailingHandler).Assembly);
+            var provider = services.BuildServiceProvider();
+
+            var dispatcher = provider.GetRequiredService<IUseCaseDispatcher>();
+
+            var ex = await Assert.ThrowsAsync<UseCaseException>(async () =>
+            {
+                await dispatcher.Send(new FailingQuery());
+            });
+
+            // Wrapper redesign removed MethodInfo.Invoke: inner must be the real
+            // InvalidOperationException, not a TargetInvocationException.
+            var inner = Assert.IsType<InvalidOperationException>(ex.InnerException);
+            Assert.Equal("boom", inner.Message);
+        }
+
+        [Fact]
+        public async Task Should_Preserve_Original_Exception_From_Async_Handler()
+        {
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddUseCases(typeof(AsyncFailingHandler).Assembly);
+            var provider = services.BuildServiceProvider();
+
+            var dispatcher = provider.GetRequiredService<IUseCaseDispatcher>();
+
+            var ex = await Assert.ThrowsAsync<UseCaseException>(async () =>
+            {
+                await dispatcher.Send(new AsyncFailingQuery());
+            });
+
+            var inner = Assert.IsType<InvalidOperationException>(ex.InnerException);
+            Assert.Equal("boom-async", inner.Message);
         }
     }
 }

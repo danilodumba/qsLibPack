@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,28 +24,22 @@ namespace qsLibPack.UseCases.IoC
 
             foreach (var assembly in assemblies)
             {
-                var handlerTypes = assembly.GetTypes()
-                    .Where(t => !t.IsAbstract && !t.IsInterface)
-                    .SelectMany(t => t.GetInterfaces()
-                        .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IUseCaseHandler<,>))
-                        .Select(i => new { Implementation = t, Service = i }))
-                    .ToArray();
-
-                foreach (var ht in handlerTypes)
+                foreach (var type in assembly.GetTypes())
                 {
-                    services.AddScoped(ht.Service, ht.Implementation);
-                }
+                    if (type.IsAbstract || type.IsInterface)
+                        continue;
 
-                var validatorTypes = assembly.GetTypes()
-                    .Where(t => !t.IsAbstract && !t.IsInterface)
-                    .SelectMany(t => t.GetInterfaces()
-                        .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>))
-                        .Select(i => new { Implementation = t, Service = i }))
-                    .ToArray();
+                    foreach (var iface in type.GetInterfaces())
+                    {
+                        if (!iface.IsGenericType)
+                            continue;
 
-                foreach (var vt in validatorTypes)
-                {
-                    services.AddScoped(vt.Service, vt.Implementation);
+                        var definition = iface.GetGenericTypeDefinition();
+                        if (definition == typeof(IUseCaseHandler<,>) || definition == typeof(IValidator<>))
+                        {
+                            services.AddScoped(iface, type);
+                        }
+                    }
                 }
             }
 

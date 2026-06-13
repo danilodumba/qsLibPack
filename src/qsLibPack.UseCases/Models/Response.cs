@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using qsLibPack.Validations;
@@ -10,6 +11,8 @@ namespace qsLibPack.UseCases.Models
     /// </summary>
     public sealed class Response : IResponse
     {
+        private static readonly Response Successful = new Response(true, Array.Empty<ErrorValidation>());
+
         public bool Success { get; }
         public IReadOnlyCollection<ErrorValidation> Errors { get; }
 
@@ -22,7 +25,7 @@ namespace qsLibPack.UseCases.Models
         /// <summary>
         /// Cria resposta de sucesso.
         /// </summary>
-        public static Response Ok() => new Response(true, new ReadOnlyCollection<ErrorValidation>(new List<ErrorValidation>()));
+        public static Response Ok() => Successful;
 
         /// <summary>
         /// Cria resposta de falha.
@@ -50,7 +53,7 @@ namespace qsLibPack.UseCases.Models
         /// <summary>
         /// Cria resposta de sucesso com payload.
         /// </summary>
-        public static Response<T> Ok(T data) => new Response<T>(true, data, new ReadOnlyCollection<ErrorValidation>(new List<ErrorValidation>()));
+        public static Response<T> Ok(T data) => new Response<T>(true, data, Array.Empty<ErrorValidation>());
 
         /// <summary>
         /// Cria resposta de falha.

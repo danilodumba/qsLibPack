@@ -6,8 +6,8 @@ namespace qsLibPack.Domain.ValueObjects
 {
     public class PasswordVO : ValueObject
     {
-        string password;
-        readonly string confirmPassword;
+        string password = string.Empty;
+        readonly string confirmPassword = string.Empty;
 
         protected PasswordVO() {}
         public PasswordVO(string password, string confirmPassword)

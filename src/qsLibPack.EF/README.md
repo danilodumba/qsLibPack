@@ -7,7 +7,7 @@ Integração com Entity Framework Core para `qsLibPack`: repositórios de consul
 ## Instalação
 
 ```bash
-dotnet add package qs.LibPack.EF --version 8.0.0
+dotnet add package qs.LibPack.EF --version 8.1.0
 ```
 
 ## Exemplos
@@ -73,7 +73,7 @@ public sealed class MetricsRepository : QueryRepository
 
 ## Informações do NuGet
 
-- Versão atual: 8.0.0
+- Versão atual: 8.1.0
 - Dependências:
   - Microsoft.EntityFrameworkCore 8.*
   - Microsoft.EntityFrameworkCore.Relational 8.*
@@ -82,6 +82,7 @@ public sealed class MetricsRepository : QueryRepository
 - Link direto: https://www.nuget.org/packages/qs.LibPack.EF/
 - Histórico (resumo):
   - 8.0.0: atualização para EF Core 8, melhorias em consultas e mapeamento
+  - 8.1.0: `SelectLinq` agora recebe `Expression<Func<T,bool>>` e retorna `IQueryable<T>`, garantindo execução **server-side** (antes o filtro era aplicado em memória); `Repository<T,TId>` implementa `IRepository<T,TId>` e `GetByID`/`GetByIDAsync` retornam tipo anulável; Nullable habilitado
 
 ## Como Contribuir
 

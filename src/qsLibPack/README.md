@@ -7,7 +7,7 @@ Biblioteca base com utilitários para DDD, CQRS, Repositórios, Validações e E
 ## Instalação
 
 ```bash
-dotnet add package qs.LibPack --version 8.0.0
+dotnet add package qs.LibPack --version 8.1.0
 ```
 
 ## Exemplos
@@ -100,17 +100,18 @@ public sealed class UsersController : ApiLibController
 
 ## Informações do NuGet
 
-- Versão atual: 8.0.0
+- Versão atual: 8.1.0
 - Dependências:
   - FluentValidation 12.1.0
   - Microsoft.Extensions.DependencyInjection 8.*
   - Microsoft.Extensions.Options.ConfigurationExtensions 8.*
-  - Microsoft.AspNetCore.Http.Features 5.0.17
-  - Microsoft.AspNetCore.Mvc.Core 2.3.0
+  - `FrameworkReference` para `Microsoft.AspNetCore.App` (controllers e middleware)
 - Compatibilidade: .NET 8 (net8.0)
+- Nullable reference types habilitado
 - Link direto: https://www.nuget.org/packages/qs.LibPack/
 - Histórico (resumo):
   - 8.0.0: migração para .NET 8, melhorias nas validações e organização dos pacotes
+  - 8.1.0: `Entity<TId>.Equals` com checagem de tipo; `EmailVO` à prova de ReDoS; `PasswordVO.ToString()` mascarado (`***`) e métodos renomeados para `CryptPassword`/`EqualsCrypt` (aliases antigos `[Obsolete]`); `ValidationMiddleware` migrado para `System.Text.Json`; `IRepository.GetByID`/`GetByIDAsync` agora retornam tipo anulável; `FrameworkReference` no lugar dos pacotes ASP.NET legados; Nullable habilitado
 
 ## Como Contribuir
 

@@ -7,7 +7,7 @@ Integração com MongoDB para `qsLibPack`: contexto, repositório base e unidade
 ## Instalação
 
 ```bash
-dotnet add package qs.LibPack.MongoDB --version 8.0.0
+dotnet add package qs.LibPack.MongoDB --version 8.1.0
 ```
 
 ## Exemplos
@@ -97,7 +97,7 @@ var loaded = await repo.GetByIDAsync(user.Id);
 
 ## Informações do NuGet
 
-- Versão atual: 8.0.0
+- Versão atual: 8.1.0
 - Dependências:
   - MongoDB.Driver 3.5.1
   - Microsoft.Extensions.DependencyInjection 8.*
@@ -106,6 +106,7 @@ var loaded = await repo.GetByIDAsync(user.Id);
 - Link direto: https://www.nuget.org/packages/qs.LibPack.MongoDB/
 - Histórico (resumo):
   - 8.0.0: suporte a net8.0, ajustes de DI e empacotamento do README
+  - 8.1.0: `MongoContext` registra `IMongoClient` como singleton (preserva connection pool) e executa os comandos do Unit of Work **sequencialmente**, limpando a fila mesmo em caso de erro; `GetByID`/`GetByIDAsync` retornam tipo anulável; Nullable habilitado
 
 ## Como Contribuir
 

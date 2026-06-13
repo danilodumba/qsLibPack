@@ -41,14 +41,14 @@ namespace qsLibPack.Repositories.EF
             return Task.CompletedTask;
         }
 
-        public virtual T GetByID(TId id)
+        public virtual T? GetByID(TId id)
         {
-            return _dbSet.FirstOrDefault(x => x.Id.Equals(id));
+            return _dbSet.FirstOrDefault(x => x.Id!.Equals(id));
         }
 
-        public async virtual Task<T> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
+        public async virtual Task<T?> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken).ConfigureAwait(false);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken).ConfigureAwait(false);
         }
 
         public virtual void Remove(T entity)

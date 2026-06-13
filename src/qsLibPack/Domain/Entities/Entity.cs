@@ -8,9 +8,9 @@ namespace qsLibPack.Domain.Entities
         public TId Id
         {
             get; protected set;
-        }
+        } = default!;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var compareTo = obj as Entity<TId>;
 
