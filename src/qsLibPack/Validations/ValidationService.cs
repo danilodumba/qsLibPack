@@ -23,7 +23,7 @@ namespace qsLibPack.Validations
         {
             foreach(var error in erros)
             {
-                this.AddErrors(error.ErrorCode, error.ErrorMessage);
+                this.AddErrors(error.PropertyName, error.ErrorMessage);
             }
         }
 

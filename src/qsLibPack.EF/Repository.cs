@@ -3,10 +3,11 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using qsLibPack.Domain.Entities;
+using qsLibPack.Repositories.Interfaces;
 
 namespace qsLibPack.Repositories.EF
 {
-    public abstract class Repository<T, TId> where T : AggregateRoot<TId>
+    public abstract class Repository<T, TId> : IRepository<T, TId> where T : AggregateRoot<TId>
     {
         protected DbSet<T> _dbSet;
 
@@ -24,8 +25,9 @@ namespace qsLibPack.Repositories.EF
         public async virtual Task CreateAsync(T entity, CancellationToken cancellationToken = default)
         {
             entity.Validate();
-            await _dbSet.AddAsync(entity, cancellationToken);
+            await _dbSet.AddAsync(entity, cancellationToken).ConfigureAwait(false);
         }
+
         public virtual void Update(T entity)
         {
             entity.Validate();
@@ -46,7 +48,7 @@ namespace qsLibPack.Repositories.EF
 
         public async virtual Task<T> GetByIDAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken).ConfigureAwait(false);
         }
 
         public virtual void Remove(T entity)

@@ -1,11 +1,10 @@
 using System;
-using System.Text;
 using System.Security.Cryptography;
 using qsLibPack.Domain.Exceptions;
 
 namespace qsLibPack.Domain.ValueObjects
 {
-    public class PasswordVO: ValueObject
+    public class PasswordVO : ValueObject
     {
         string password;
         readonly string confirmPassword;
@@ -19,15 +18,16 @@ namespace qsLibPack.Domain.ValueObjects
             this.Validate();
         }
 
-         public override string ToString() 
-            => password;
+        public override string ToString()
+            => "***";
 
         public override void Validate()
         {
-            if (password != confirmPassword) 
+            if (password != confirmPassword)
                 throw new DomainException("Senhas nao conferem");
         }
-        public bool EqualsCript(string obj)
+
+        public bool EqualsCrypt(string obj)
         {
             if (string.IsNullOrEmpty(this.password))
             {
@@ -47,7 +47,10 @@ namespace qsLibPack.Domain.ValueObjects
             return CryptographicOperations.FixedTimeEquals(storedHash, computedHash);
         }
 
-        public void CriptPassword()
+        [Obsolete("Use EqualsCrypt instead.")]
+        public bool EqualsCript(string obj) => EqualsCrypt(obj);
+
+        public void CryptPassword()
         {
             var salt = new byte[16];
             RandomNumberGenerator.Fill(salt);
@@ -56,6 +59,9 @@ namespace qsLibPack.Domain.ValueObjects
 
             this.password = string.Concat(Convert.ToBase64String(salt), ":", Convert.ToBase64String(hash));
         }
+
+        [Obsolete("Use CryptPassword instead.")]
+        public void CriptPassword() => CryptPassword();
 
         private static byte[] DeriveHash(string value, byte[] salt)
         {

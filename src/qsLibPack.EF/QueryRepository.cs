@@ -1,9 +1,10 @@
 using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 namespace qsLibPack.Repositories.EF
 {
@@ -19,7 +20,7 @@ namespace qsLibPack.Repositories.EF
         /// Faz o select em seu banco de dados usando o LINQ do Entity Framework (EF)
         /// </summary>
         /// <typeparam name="TEntity">Sua classe de entidade</typeparam>
-        protected IEnumerable<TEntity> SelectLinq<TEntity>(Func<TEntity, bool> predicate) where TEntity: class
+        protected IQueryable<TEntity> SelectLinq<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class
         {
             return _context.Set<TEntity>().Where(predicate);
         }
@@ -28,7 +29,7 @@ namespace qsLibPack.Repositories.EF
         /// Faz o select em seu banco de dados
         /// </summary>
         /// <typeparam name="Tdto"></typeparam>
-        protected IList<Tdto> SelectSql<Tdto>(string sql, params object[] parameters) where Tdto: class
+        protected IList<Tdto> SelectSql<Tdto>(string sql, params object[] parameters) where Tdto : class
         {
             using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = sql;
@@ -76,28 +77,28 @@ namespace qsLibPack.Repositories.EF
 
         private static List<Tdto> DataReaderMapToList<Tdto>(DbDataReader dr)
         {
-            List<Tdto> list = new List<Tdto>();
+            var list = new List<Tdto>();
 
-            if (dr.HasRows)
-            {
-                while (dr.Read())
-                {
-                    var dto = Activator.CreateInstance<Tdto>();
-                    foreach (PropertyInfo prop in dto.GetType().GetProperties())
-                    {
-                        if (dr.GetColumnSchema().Any(x => x.ColumnName.ToUpper() == prop.Name.ToUpper()))
-                        {
-                            if (!Equals(dr[prop.Name], DBNull.Value))
-                            {
-                                prop.SetValue(dto, dr[prop.Name], null);
-                            }
-                        }
-                    }
-                    list.Add(dto);
-                }
+            if (!dr.HasRows)
                 return list;
+
+            var columns = new HashSet<string>(dr.GetColumnSchema().Select(x => x.ColumnName.ToUpperInvariant()), StringComparer.OrdinalIgnoreCase);
+            var props = typeof(Tdto).GetProperties();
+
+            while (dr.Read())
+            {
+                var dto = Activator.CreateInstance<Tdto>();
+                foreach (PropertyInfo prop in props)
+                {
+                    if (columns.Contains(prop.Name.ToUpperInvariant()) && !Equals(dr[prop.Name], DBNull.Value))
+                    {
+                        prop.SetValue(dto, dr[prop.Name], null);
+                    }
+                }
+                list.Add(dto);
             }
-            return new List<Tdto>();
+
+            return list;
         }
     }
 }

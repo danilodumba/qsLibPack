@@ -9,6 +9,7 @@ namespace qsLibPack.Domain.ValueObjects
         private NameVO(string nome)
         {
             _nome = nome;
+            _nome.NotNullOrEmpty("O campo nome nao pode ser vazio.");
         }
 
         public void Validate()

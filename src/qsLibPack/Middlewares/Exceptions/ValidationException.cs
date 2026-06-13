@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Middlewares.Exceptions
+namespace qsLibPack.Middlewares.Exceptions
 {
     public class ValidationException : Exception
     {

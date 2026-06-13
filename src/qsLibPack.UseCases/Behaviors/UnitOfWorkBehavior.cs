@@ -22,8 +22,11 @@ namespace qsLibPack.UseCases.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, Func<Task<TResponse>> next)
         {
-            var response = await next();
-            await unitOfWork.CommitAsync(cancellationToken);
+            var response = await next().ConfigureAwait(false);
+
+            if (response is not IResponse { Success: false })
+                await unitOfWork.CommitAsync(cancellationToken).ConfigureAwait(false);
+
             return response;
         }
     }

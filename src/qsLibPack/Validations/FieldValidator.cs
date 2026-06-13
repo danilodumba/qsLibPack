@@ -44,17 +44,16 @@ namespace qsLibPack.Validations
                 .NotEmpty().WithMessage(message);
         }
 
-        public void NotNull(object valor, string message)
+        public void NotNull(object? valor, string message)
         {
             this.RuleFor(x => valor)
-                .NotNull();
+                .Must(v => v != null).WithMessage(message);
         }
 
         public void NotNull(Guid valor, string message)
         {
             this.RuleFor(x => valor)
-                .NotEqual(Guid.Empty).WithMessage(message)
-                .NotNull(message);
+                .NotEqual(Guid.Empty).WithMessage(message);
         }
     }
 }

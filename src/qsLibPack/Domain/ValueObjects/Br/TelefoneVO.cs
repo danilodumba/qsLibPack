@@ -1,14 +1,14 @@
-﻿using qsLibPack.Domain.Exceptions;
+using qsLibPack.Domain.Exceptions;
 using qsLibPack.Extensions;
 
 namespace qsLibPack.Domain.ValueObjects.Br
 {
     public struct TelefoneVO
     {
-        string _value;
+        readonly string _value;
         private TelefoneVO(string value)
         {
-            _value = value;
+            _value = string.IsNullOrEmpty(value) ? value : value.OnlyNumbers();
             Validar();
         }
 
@@ -16,14 +16,10 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(_value)) return;
 
-            string telefone = _value.OnlyNumbers();
-            
-            if (telefone.Length < 10 || telefone.Length > 11) throw new DomainException("Telefone inválido");
-
-            _value = telefone;
+            if (_value.Length < 10 || _value.Length > 11) throw new DomainException("Telefone inválido");
         }
 
-        public override string ToString() 
+        public override string ToString()
             => _value;
 
         public static implicit operator TelefoneVO(string value)

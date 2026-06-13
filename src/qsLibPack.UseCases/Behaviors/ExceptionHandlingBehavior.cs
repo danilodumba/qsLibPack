@@ -26,7 +26,7 @@ namespace qsLibPack.UseCases.Behaviors
         {
             try
             {
-                return await next();
+                return await next().ConfigureAwait(false);
             }
             catch (UseCaseException)
             {

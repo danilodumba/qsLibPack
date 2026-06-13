@@ -34,6 +34,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         #region [ Private Methods ]
         private void SetCep(string value)
         {
+            if (value == null) return;
             string newValue = "";
             foreach(var c in value)
             {
@@ -63,7 +64,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(this.Logradouro))
             {
-                throw new DomainException("Infome um endereco");
+                throw new DomainException("Informe um endereco");
             }
         }
 
@@ -71,7 +72,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(this.Numero))
             {
-                throw new DomainException("Infome um numero");
+                throw new DomainException("Informe um numero");
             }
         }
 
@@ -79,7 +80,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(this.Cidade))
             {
-                throw new DomainException("Infome uma cidade");
+                throw new DomainException("Informe uma cidade");
             }
         }
 
@@ -87,7 +88,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(this.Estado))
             {
-                throw new DomainException("Infome um estado");
+                throw new DomainException("Informe um estado");
             }
         }
 
@@ -95,7 +96,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(this.Cep))
             {
-                throw new DomainException("Infome um CEP");
+                throw new DomainException("Informe um CEP");
             }
         }
 
@@ -103,7 +104,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
         {
             if (string.IsNullOrEmpty(this.Bairro))
             {
-                throw new DomainException("Infome um bairro");
+                throw new DomainException("Informe um bairro");
             }
         }
 

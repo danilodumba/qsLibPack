@@ -10,11 +10,11 @@ namespace qsLibPack.Domain.ValueObjects.Br
         private readonly string _value;
         private CpfCnpjVO(string cpfCnpj)
         {
-            _value = cpfCnpj.OnlyNumbers();
-            this.ValidarCpfCnpf(_value);
+            _value = cpfCnpj != null ? cpfCnpj.OnlyNumbers() : string.Empty;
+            this.ValidarCpfCnpj(_value);
         }
 
-        private bool ValidarCpfCnpf(string cpfcnpj)
+        private bool ValidarCpfCnpj(string cpfcnpj)
         {
             if (string.IsNullOrEmpty(cpfcnpj))
                 return true;
@@ -82,7 +82,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
 
         public void Validate()
         {
-            if (!this.ValidarCpfCnpf(_value))
+            if (!this.ValidarCpfCnpj(_value))
             {
                 throw new DomainException("CPF ou CNPJ inválido");
             }
@@ -90,7 +90,7 @@ namespace qsLibPack.Domain.ValueObjects.Br
 
         public bool IsValid()
         {
-            return this.ValidarCpfCnpf(_value);
+            return this.ValidarCpfCnpj(_value);
         }
 
         public static implicit operator CpfCnpjVO(string value)

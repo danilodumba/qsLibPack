@@ -1,15 +1,19 @@
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using qsLibPack.Validations.Interface;
 
 namespace qsLibPack.Middlewares
 {
     public class ValidationMiddleware
     {
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         private readonly RequestDelegate _next;
 
         public ValidationMiddleware(RequestDelegate next)
@@ -19,27 +23,22 @@ namespace qsLibPack.Middlewares
 
         public async Task Invoke(HttpContext httpContext, IValidationService validationService)
         {
-            await _next(httpContext);
+            await _next(httpContext).ConfigureAwait(false);
 
             if (!validationService.IsValid())
             {
-                await this.HandleValidation(httpContext, validationService);
+                await HandleValidation(httpContext, validationService).ConfigureAwait(false);
             }
         }
 
-        private async Task HandleValidation(HttpContext context, IValidationService validationService)
+        private static async Task HandleValidation(HttpContext context, IValidationService validationService)
         {
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-
             if (!context.Response.HasStarted)
             {
-                var result = JsonConvert.SerializeObject(validationService.GetErrors(), settings);
+                var result = JsonSerializer.Serialize(validationService.GetErrors(), JsonOptions);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await context.Response.WriteAsync(result, context.RequestAborted);
+                await context.Response.WriteAsync(result, context.RequestAborted).ConfigureAwait(false);
             }
         }
     }

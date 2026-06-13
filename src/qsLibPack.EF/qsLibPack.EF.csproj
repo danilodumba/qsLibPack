@@ -9,6 +9,8 @@
     <Company>DDS.TEC</Company>
     <Description>Integração Entity Framework Core para qsLibPack: Repositórios e consultas.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Nullable>enable</Nullable>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

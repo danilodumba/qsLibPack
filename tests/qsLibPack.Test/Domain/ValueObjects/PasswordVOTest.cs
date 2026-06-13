@@ -20,7 +20,7 @@ namespace qsLibPack.Test.Domain.ValueObjects
         public void Deve_Retornar_Password_Valido(string password, string confirmPassword)
         {
            var vo = new PasswordVO(password, confirmPassword);
-           Assert.Equal(password, vo.ToString());
+           Assert.Equal("***", vo.ToString());
         }
 
         [Theory]
@@ -29,8 +29,8 @@ namespace qsLibPack.Test.Domain.ValueObjects
         public void Deve_Testar_Criptografia(string password, string confirmPassword)
         {
            var vo = new PasswordVO(password, confirmPassword);
-           vo.CriptPassword();
-           Assert.True(vo.EqualsCript(password));
+           vo.CryptPassword();
+           Assert.True(vo.EqualsCrypt(password));
         }
     }
 }

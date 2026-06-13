@@ -15,7 +15,7 @@ namespace qsLibPack.Repositories.Mongo
 
         public async Task CommitAsync(CancellationToken cancellationToken = default)
         {
-            await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

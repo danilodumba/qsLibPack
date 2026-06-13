@@ -9,14 +9,15 @@
     <PackageDescription>Pacote com libs para padronização de desenvolvimento com DDD, CQRS, Repository, Validations e Extensions </PackageDescription>
     <RepositoryUrl>https://github.com/danilodumba/qsLibPack</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Nullable>enable</Nullable>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="FluentValidation" Version="12.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>

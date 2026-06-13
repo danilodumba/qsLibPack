@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
-using FluentValidation.Results;
 using qsLibPack.Validations;
 using qsLibPack.UseCases.Abstractions;
 using qsLibPack.UseCases.Exceptions;
@@ -26,10 +25,10 @@ namespace qsLibPack.UseCases.Behaviors
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, System.Func<Task<TResponse>> next)
         {
             if (validators.Length == 0)
-                return await next();
+                return await next().ConfigureAwait(false);
 
             var context = new ValidationContext<TRequest>(request);
-            var failures = (await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken))))
+            var failures = (await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken))).ConfigureAwait(false))
                 .SelectMany(r => r.Errors)
                 .Where(f => f != null)
                 .ToList();
@@ -40,7 +39,7 @@ namespace qsLibPack.UseCases.Behaviors
                 throw new UseCaseException("Validação falhou.", errors);
             }
 
-            return await next();
+            return await next().ConfigureAwait(false);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
 namespace qsLibPack.Domain.Entities
 {
@@ -14,9 +15,9 @@ namespace qsLibPack.Domain.Entities
             var compareTo = obj as Entity<TId>;
 
             if (ReferenceEquals(this, compareTo)) return true;
-            if (compareTo is null) return false;
+            if (compareTo is null || GetType() != compareTo.GetType()) return false;
 
-            return Id.Equals(compareTo.Id);
+            return EqualityComparer<TId>.Default.Equals(Id, compareTo.Id);
         }
 
         public static bool operator ==(Entity<TId> a, Entity<TId> b)
@@ -37,7 +38,7 @@ namespace qsLibPack.Domain.Entities
 
         public override int GetHashCode()
         {
-            return (GetType().GetHashCode() ^ 93) + Id.GetHashCode();
+            return (GetType().GetHashCode() ^ 93) + EqualityComparer<TId>.Default.GetHashCode(Id!);
         }
 
         public abstract void Validate();
